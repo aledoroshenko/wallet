@@ -9,7 +9,16 @@ import {
   TextInput,
   Button,
   Form,
+  List,
+  Table,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "grommet";
+import { LastUsed } from "./LastUsed";
+import { SearchForm } from "./SearchForm";
+import { TransactionsList } from "./TransactionsList";
 
 const theme = {
   global: {
@@ -21,19 +30,7 @@ const theme = {
   },
 };
 
-const options = [
-  { label: "rinkeby", value: "rinkeby" },
-  { label: "mainnet", value: "mainnet" },
-];
-
-const defaultValue = {
-  address: "",
-  network: "rinkeby",
-};
-
 function App() {
-  const [value, setValue] = React.useState(defaultValue);
-
   return (
     <Grommet theme={theme}>
       <Box
@@ -43,51 +40,21 @@ function App() {
         pad="xlarge"
         gap="medium"
       >
-        <Box
-          width="large"
-          height="large"
-          background="white"
-          elevation="medium"
-          pad="medium"
-        >
+        <Box width="large" background="white" elevation="medium" pad="medium">
           <Box>
-            <Heading margin="none">Wallet</Heading>
+            <Heading>Wallet</Heading>
           </Box>
 
-          <Box margin={{ top: "medium" }}>
-            <Form
-              value={value}
-              onChange={(nextValue) => {
-                console.log("Nextvalue", nextValue);
-                setValue(nextValue);
-              }}
-              onReset={() => setValue(defaultValue)}
-              onSubmit={({ value }: any) => {
-                console.log(value);
-              }}
-            >
-              <FormField
-                name="address"
-                htmlFor="address-id"
-                label="Address"
-                validate={{ regexp: /^[0-9]{4,6}$/, message: "4-6 digits" }}
-              >
-                <TextInput id="address-id" name="address" />
-              </FormField>
-              <FormField label="Network" name="network">
-                <Select
-                  name="network"
-                  options={options}
-                  labelKey="label"
-                  valueKey="value"
-                  value={options[0]}
-                />
-              </FormField>
+          <Box>
+            <SearchForm />
+          </Box>
 
-              <Box direction="row" justify="between" margin={{ top: "medium" }}>
-                <Button type="submit" label="Search" primary />
-              </Box>
-            </Form>
+          <Box margin={{ top: "large" }}>
+            <LastUsed />
+          </Box>
+
+          <Box margin={{ top: "large" }}>
+            <TransactionsList />
           </Box>
         </Box>
       </Box>
