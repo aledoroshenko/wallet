@@ -1,5 +1,4 @@
 import {
-  Box,
   Heading,
   Table,
   TableBody,
@@ -8,12 +7,24 @@ import {
   TableRow,
 } from "grommet";
 import React from "react";
+import { TTransaction } from "./reducer";
 
-export function TransactionsList() {
+type TTransactionsListProps = {
+  id: string;
+  transactions: TTransaction[];
+};
+
+function formatDate(timeStamp: number) {
+  const date = new Date(timeStamp * 1000);
+
+  return new Intl.DateTimeFormat("en-GB").format(date);
+}
+
+export function TransactionsList({ id, transactions }: TTransactionsListProps) {
   return (
     <React.Fragment>
       <Heading level={3} size="small">
-        Transactions
+        Transactions for {id}
       </Heading>
 
       <Table>
@@ -31,13 +42,17 @@ export function TransactionsList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell scope="row">
-              <strong>Eric</strong>
-            </TableCell>
-            <TableCell>12 June</TableCell>
-            <TableCell>Coconut</TableCell>
-          </TableRow>
+          {transactions.map(({ blockNumber, value, timeStamp }) => {
+            return (
+              <TableRow key={blockNumber}>
+                <TableCell scope="row">
+                  <strong>{blockNumber}</strong>
+                </TableCell>
+                <TableCell>{formatDate(timeStamp)}</TableCell>
+                <TableCell>{value}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </React.Fragment>

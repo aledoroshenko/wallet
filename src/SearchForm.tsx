@@ -1,44 +1,43 @@
-import {
-  Box,
-  Button,
-  Form,
-  FormField,
-  Heading,
-  Select,
-  TextInput,
-} from "grommet";
+import { Box, Button, Form, FormField, Select, TextInput } from "grommet";
 import React from "react";
+import { useAppDispatch, TDispatch, requestAccountData } from "./reducer";
 
-const options = [
-  { label: "rinkeby", value: "rinkeby" },
-  { label: "mainnet", value: "mainnet" },
+const objectOptions = [
+  { label: "Rinkeby", value: "rinkeby" },
+  { label: "Mainnet", value: "mainnet" },
 ];
 
 const defaultValue = {
   address: "",
-  network: "rinkeby",
+  network: objectOptions[0].value,
 };
 
 export function SearchForm() {
   const [value, setValue] = React.useState(defaultValue);
+  const dispatch = useAppDispatch();
 
   return (
     <React.Fragment>
       <Form
         value={value}
         onChange={(nextValue) => {
+          console.log("Change", nextValue);
           setValue(nextValue);
         }}
         onReset={() => setValue(defaultValue)}
         onSubmit={({ value }: any) => {
-          console.log(value);
+          requestAccountData(
+            dispatch as TDispatch,
+            "0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a",
+            value.network
+          );
         }}
       >
         <FormField
           name="address"
           htmlFor="address-id"
           label="Address"
-          validate={{ regexp: /^[0-9]{4,6}$/, message: "4-6 digits" }}
+          // validate={{ regexp: /^[0-9]{4,6}$/, message: "4-6 digits" }}
         >
           <TextInput
             placeholder="0xfFfa5813ED9a5DB4880D7303DB7d0cBe41bC771F"
@@ -48,11 +47,13 @@ export function SearchForm() {
         </FormField>
         <FormField label="Network" name="network">
           <Select
+            id="network"
             name="network"
-            options={options}
+            placeholder="Select"
             labelKey="label"
-            valueKey="value"
-            value={options[0]}
+            valueKey={{ key: "value", reduce: true }}
+            value={value.network}
+            options={objectOptions}
           />
         </FormField>
 

@@ -1,24 +1,9 @@
 import React from "react";
-import {
-  Grommet,
-  Box,
-  Main,
-  Heading,
-  Select,
-  FormField,
-  TextInput,
-  Button,
-  Form,
-  List,
-  Table,
-  TableHeader,
-  TableRow,
-  TableCell,
-  TableBody,
-} from "grommet";
+import { Grommet, Box, Heading } from "grommet";
 import { LastUsed } from "./LastUsed";
 import { SearchForm } from "./SearchForm";
 import { TransactionsList } from "./TransactionsList";
+import { useAppState } from "./reducer";
 
 const theme = {
   global: {
@@ -31,6 +16,13 @@ const theme = {
 };
 
 function App() {
+  const {
+    recentAccountsIds,
+    currentAccountId,
+    accounts,
+    isFetching,
+  } = useAppState();
+
   return (
     <Grommet theme={theme}>
       <Box
@@ -40,7 +32,7 @@ function App() {
         pad="xlarge"
         gap="medium"
       >
-        <Box width="large" background="white" elevation="medium" pad="medium">
+        <Box width="large" elevation="medium" pad="medium">
           <Box>
             <Heading>Wallet</Heading>
           </Box>
@@ -49,13 +41,20 @@ function App() {
             <SearchForm />
           </Box>
 
-          <Box margin={{ top: "large" }}>
-            <LastUsed />
-          </Box>
+          {recentAccountsIds.length === 0 ? null : (
+            <Box margin={{ top: "large" }}>
+              <LastUsed ids={recentAccountsIds.slice(0, 5)} />
+            </Box>
+          )}
 
-          <Box margin={{ top: "large" }}>
-            <TransactionsList />
-          </Box>
+          {isFetching ? null : currentAccountId ? (
+            <Box margin={{ top: "large" }}>
+              <TransactionsList
+                id={currentAccountId}
+                transactions={accounts[currentAccountId].transactions}
+              />
+            </Box>
+          ) : null}
         </Box>
       </Box>
     </Grommet>
