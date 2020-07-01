@@ -1,5 +1,6 @@
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
+import { cleanupTransactions } from "./utils";
 
 export type TTransaction = {
   blockNumber: string;
@@ -55,14 +56,6 @@ export const initialState: TState = {
     network: "mainnet",
   },
 };
-
-function cleanupTransactions(transactions: TTransaction[]) {
-  return transactions.map(({ blockNumber, timeStamp, value }) => ({
-    blockNumber,
-    timeStamp,
-    value,
-  }));
-}
 
 export function reducer(state: TState, action: TAction): TState {
   switch (action.type) {
@@ -129,50 +122,4 @@ export function useAppDispatch() {
   }
 
   return context;
-}
-
-function getUrlsForNetwork(network: TNetwork, accountId: string) {
-  const apiKey = "PAX4HJUWPXC5TMG26IAHITAH2EIV6WFWHC";
-
-  if (network === "mainnet") {
-    return {
-      accountBalanceUrl: `https://api.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
-      accountTransactionsUrl: `http://api.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
-    };
-  }
-
-  return {
-    accountBalanceUrl: `https://api-rinkeby.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
-    accountTransactionsUrl: `http://api-rinkeby.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
-  };
-}
-
-export async function requestAccountData(
-  dispatch: TDispatch,
-  address: string,
-  network: TNetwork
-) {
-  dispatch({ type: "ACCOUNT_DATA_REQUESTED" });
-
-  const { accountBalanceUrl, accountTransactionsUrl } = getUrlsForNetwork(
-    network,
-    address
-  );
-
-  let transactionsResponse = await fetch(accountTransactionsUrl);
-
-  let { result: transactions } = await transactionsResponse.json();
-
-  let balanceResponse = await fetch(accountBalanceUrl);
-  let { result: balance } = await balanceResponse.json();
-
-  dispatch({
-    type: "ACCOUNT_DATA_RECEIVED",
-    data: {
-      transactions: transactions.slice(0, 10),
-      balance,
-      address,
-      network,
-    },
-  });
 }

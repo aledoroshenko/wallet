@@ -1,12 +1,8 @@
 import { Box, Button, Form, FormField, Select, TextInput } from "grommet";
 import ethereumRegex from "ethereum-regex";
 import React from "react";
-import {
-  useAppDispatch,
-  TDispatch,
-  requestAccountData,
-  TNetwork,
-} from "./reducer";
+import { useAppDispatch, TDispatch, TNetwork } from "./reducer";
+import { requestAccountData } from "./actions";
 
 const objectOptions = [
   { label: "Rinkeby", value: "rinkeby" },
