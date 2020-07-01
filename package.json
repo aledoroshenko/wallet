@@ -10,6 +10,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "ethereum-regex": "^1.1.12",
     "grommet": "^2.14.0",
     "grommet-icons": "^4.4.0",
     "react": "^16.13.1",

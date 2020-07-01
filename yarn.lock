@@ -4296,6 +4296,11 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
+ethereum-regex@^1.1.12:
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/ethereum-regex/-/ethereum-regex-1.1.12.tgz#8f6b88406b489c71a96cde3710f00283b0498d02"
+  integrity sha512-6YOKgUlbPDi+tL1awEAc0Q3m546Gbj9qEdB8rEg2EW2vrr7La0XgrutOJ9j45p+a4yq1+dC15aQhhcLHosv0Tg==
+
 eventemitter3@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"

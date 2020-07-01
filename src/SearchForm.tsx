@@ -1,4 +1,5 @@
 import { Box, Button, Form, FormField, Select, TextInput } from "grommet";
+import ethereumRegex from "ethereum-regex";
 import React from "react";
 import { useAppDispatch, TDispatch, requestAccountData } from "./reducer";
 
@@ -11,6 +12,14 @@ const defaultValue = {
   address: "",
   network: objectOptions[0].value,
 };
+
+function validateAddress(address: string) {
+  const isValidAddress = ethereumRegex({ exact: true }).test(address);
+
+  if (!isValidAddress) {
+    return "Invalid address";
+  }
+}
 
 export function SearchForm() {
   const [value, setValue] = React.useState(defaultValue);
@@ -37,7 +46,7 @@ export function SearchForm() {
           name="address"
           htmlFor="address-id"
           label="Address"
-          // validate={{ regexp: /^[0-9]{4,6}$/, message: "4-6 digits" }}
+          validate={validateAddress}
         >
           <TextInput
             placeholder="0xfFfa5813ED9a5DB4880D7303DB7d0cBe41bC771F"
