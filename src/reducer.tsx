@@ -1,4 +1,5 @@
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export type TTransaction = {
   blockNumber: string;
@@ -6,55 +7,94 @@ export type TTransaction = {
   value: string;
 };
 
+export type TNetwork = "rinkeby" | "mainnet";
+
 type TAction =
   | { type: "ACCOUNT_DATA_REQUESTED" }
   | {
       type: "ACCOUNT_DATA_RECEIVED";
-      data: { balance: string; transactions: TTransaction[]; account: string };
+      data: Omit<TAccountData, "id">;
+    }
+  | {
+      type: "RECENTLY_USED_ADDRESS_SET";
+      data: { address: string; network: TNetwork };
     };
+
+type TAccountData = {
+  balance: string;
+  transactions: TTransaction[];
+  address: string;
+  network: TNetwork;
+  id: string;
+};
 
 export type TDispatch = (action: TAction) => void;
 
 type TState = {
   isFetching: boolean;
-  currentAccountId: string | null;
-  accounts: {
-    [key: string]: {
-      balance: string;
-      transactions: TTransaction[];
-    };
+  currentId: string | null;
+  addressesById: {
+    [key: string]: TAccountData;
   };
-  recentAccountsIds: string[];
+  recentIds: string[];
+  currentFormData: {
+    address: string;
+    network: TNetwork;
+  };
 };
+
 type TAppProviderProps = { children: React.ReactNode };
 
 export const initialState: TState = {
   isFetching: false,
-  currentAccountId: null,
-  accounts: {},
-  recentAccountsIds: [],
+  currentId: null,
+  addressesById: {},
+  recentIds: [],
+  currentFormData: {
+    address: "",
+    network: "mainnet",
+  },
 };
+
+function cleanupTransactions(transactions: TTransaction[]) {
+  return transactions.map(({ blockNumber, timeStamp, value }) => ({
+    blockNumber,
+    timeStamp,
+    value,
+  }));
+}
 
 export function reducer(state: TState, action: TAction): TState {
   switch (action.type) {
+    case "RECENTLY_USED_ADDRESS_SET":
+      return {
+        ...state,
+        currentFormData: {
+          address: action.data.address,
+          network: action.data.network,
+        },
+      };
     case "ACCOUNT_DATA_REQUESTED":
       return {
         ...state,
         isFetching: true,
       };
     case "ACCOUNT_DATA_RECEIVED":
+      const id = uuidv4();
       return {
         ...state,
-        accounts: {
-          ...state.accounts,
-          [action.data.account]: {
-            ...state.accounts[action.data.account],
+        addressesById: {
+          ...state.addressesById,
+          [id]: {
+            id,
+            address: action.data.address,
             balance: action.data.balance,
-            transactions: action.data.transactions,
+            transactions: cleanupTransactions(action.data.transactions),
+            network: action.data.network,
           },
         },
-        currentAccountId: action.data.account,
-        recentAccountsIds: [...state.recentAccountsIds, action.data.account],
+        currentId: id,
+        recentIds: [...state.recentIds, id],
         isFetching: false,
       };
     default:
@@ -91,33 +131,32 @@ export function useAppDispatch() {
   return context;
 }
 
-function getUrlsForNetwork(network: "rinkeby" | "mainnet", account: string) {
+function getUrlsForNetwork(network: TNetwork, accountId: string) {
   const apiKey = "PAX4HJUWPXC5TMG26IAHITAH2EIV6WFWHC";
 
   if (network === "mainnet") {
     return {
-      accountBalanceUrl: `https://api.etherscan.io/api?module=account&action=balance&address=${account}&apikey=${apiKey}`,
-      accountTransactionsUrl: `http://api.etherscan.io/api?module=account&action=txlist&sort=desc&address=${account}&apikey=${apiKey}`,
+      accountBalanceUrl: `https://api.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
+      accountTransactionsUrl: `http://api.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
     };
   }
 
   return {
-    accountBalanceUrl: `https://api-rinkeby.etherscan.io/api?module=account&action=balance&address=${account}&apikey=${apiKey}`,
-    accountTransactionsUrl: `http://api-rinkeby.etherscan.io/api?module=account&action=txlist&sort=desc&address=${account}&apikey=${apiKey}`,
+    accountBalanceUrl: `https://api-rinkeby.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
+    accountTransactionsUrl: `http://api-rinkeby.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
   };
 }
 
 export async function requestAccountData(
   dispatch: TDispatch,
-  account: string,
-  network: "rinkeby" | "mainnet"
+  address: string,
+  network: TNetwork
 ) {
-  console.log(network);
   dispatch({ type: "ACCOUNT_DATA_REQUESTED" });
 
   const { accountBalanceUrl, accountTransactionsUrl } = getUrlsForNetwork(
     network,
-    account
+    address
   );
 
   let transactionsResponse = await fetch(accountTransactionsUrl);
@@ -129,6 +168,11 @@ export async function requestAccountData(
 
   dispatch({
     type: "ACCOUNT_DATA_RECEIVED",
-    data: { transactions: transactions.slice(0, 10), balance, account },
+    data: {
+      transactions: transactions.slice(0, 10),
+      balance,
+      address,
+      network,
+    },
   });
 }

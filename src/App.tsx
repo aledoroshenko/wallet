@@ -17,10 +17,11 @@ const theme = {
 
 function App() {
   const {
-    recentAccountsIds,
-    currentAccountId,
-    accounts,
+    recentIds,
+    currentId,
+    addressesById,
     isFetching,
+    currentFormData,
   } = useAppState();
 
   return (
@@ -38,20 +39,21 @@ function App() {
           </Box>
 
           <Box>
-            <SearchForm />
+            <SearchForm currentFormData={currentFormData} />
           </Box>
 
-          {recentAccountsIds.length === 0 ? null : (
+          {recentIds.length === 0 ? null : (
             <Box margin={{ top: "large" }}>
-              <LastUsed ids={recentAccountsIds.slice(0, 5)} />
+              <LastUsed recentIds={recentIds.slice(0, 5)} />
             </Box>
           )}
 
-          {isFetching ? null : currentAccountId ? (
+          {isFetching ? null : currentId ? (
             <Box margin={{ top: "large" }}>
               <TransactionsList
-                id={currentAccountId}
-                transactions={accounts[currentAccountId].transactions}
+                id={currentId}
+                transactions={addressesById[currentId].transactions}
+                balance={addressesById[currentId].balance}
               />
             </Box>
           ) : null}

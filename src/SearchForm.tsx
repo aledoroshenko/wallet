@@ -1,17 +1,17 @@
 import { Box, Button, Form, FormField, Select, TextInput } from "grommet";
 import ethereumRegex from "ethereum-regex";
 import React from "react";
-import { useAppDispatch, TDispatch, requestAccountData } from "./reducer";
+import {
+  useAppDispatch,
+  TDispatch,
+  requestAccountData,
+  TNetwork,
+} from "./reducer";
 
 const objectOptions = [
   { label: "Rinkeby", value: "rinkeby" },
   { label: "Mainnet", value: "mainnet" },
 ];
-
-const defaultValue = {
-  address: "",
-  network: objectOptions[0].value,
-};
 
 function validateAddress(address: string) {
   const isValidAddress = ethereumRegex({ exact: true }).test(address);
@@ -21,23 +21,32 @@ function validateAddress(address: string) {
   }
 }
 
-export function SearchForm() {
-  const [value, setValue] = React.useState(defaultValue);
+type TSearchFormProps = {
+  currentFormData: {
+    address: string;
+    network: TNetwork;
+  };
+};
+
+export function SearchForm({ currentFormData }: TSearchFormProps) {
+  const [value, setValue] = React.useState(currentFormData);
   const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    setValue(currentFormData);
+  }, [currentFormData]);
 
   return (
     <React.Fragment>
       <Form
         value={value}
         onChange={(nextValue) => {
-          console.log("Change", nextValue);
           setValue(nextValue);
         }}
-        onReset={() => setValue(defaultValue)}
         onSubmit={({ value }: any) => {
           requestAccountData(
             dispatch as TDispatch,
-            "0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a",
+            value.address,
             value.network
           );
         }}
