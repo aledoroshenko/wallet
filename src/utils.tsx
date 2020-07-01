@@ -14,12 +14,12 @@ export function getUrlsForNetwork(network: TNetwork, accountId: string) {
   if (network === "mainnet") {
     return {
       accountBalanceUrl: `https://api.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
-      accountTransactionsUrl: `http://api.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
+      accountTransactionsUrl: `https://api.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
     };
   }
 
   return {
     accountBalanceUrl: `https://api-rinkeby.etherscan.io/api?module=account&action=balance&address=${accountId}&apikey=${apiKey}`,
-    accountTransactionsUrl: `http://api-rinkeby.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
+    accountTransactionsUrl: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&sort=desc&address=${accountId}&apikey=${apiKey}`,
   };
 }
